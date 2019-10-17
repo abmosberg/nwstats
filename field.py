@@ -384,7 +384,7 @@ class Field:
             image = cv2.imread(self.image_path)
             plt.imshow(image, cmap='gray', interpolation='nearest')
             plt.axis((0, image.shape[1], image.shape[0], 0))
-        f.plotCircles(ax, blobs, fig, dict(color='red', linewidth=2, fill=False))
+        f.plotCircles(ax, blobs, dict(color='red', linewidth=2, fill=False))
         ax.set_yticklabels([])
         ax.set_xticklabels([])
         plt.tight_layout()

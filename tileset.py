@@ -249,7 +249,7 @@ class Tileset:
         plt.tight_layout()
 
         plt.imshow(tile, cmap='gray', interpolation='nearest')
-        f.plotCircles(ax, blobs, fig, dict(color='#114400', linewidth=4, fill=False))
+        f.plotCircles(ax, blobs, dict(color='#114400', linewidth=4, fill=False))
         plt.plot(offset[0], offset[1], '.', color='red', markersize=10)
 
         # Get input
@@ -755,7 +755,7 @@ class Tileset:
         plt.axis((0, 1023, 1023, 0))
 
         plt.imshow(tile, cmap='gray', interpolation='nearest')
-        f.plotCircles(ax, blobs, fig, dict(color='red', linewidth=1, fill=False))
+        f.plotCircles(ax, blobs, dict(color='red', linewidth=1, fill=False))
         ax.set_yticklabels([])
         ax.set_xticklabels([])
         plt.tight_layout()
