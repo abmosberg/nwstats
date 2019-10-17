@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy import misc
+from imageio import imread, imsave
 import random
 import pickle
 import os
@@ -40,7 +40,7 @@ class Tileset:
         """
         file_path = self.path + '/c_' + str(col) + '/tile_' + str(row) + self.ext
         try:
-            tile = misc.imread(file_path)
+            tile = imread(file_path)
         except FileNotFoundError:
             tile = np.zeros((self.tileh, self.tilew), dtype=np.uint8)
 
@@ -120,7 +120,7 @@ class Tileset:
                 cropped_tile = tile[p:-p, p:-p]
 
                 filename = col_path + '/tile_' + str(row) + self.ext
-                misc.imsave(filename, cropped_tile)
+                imsave(filename, cropped_tile)
                 print('Saved tile ' + str(col) + ', ' + str(row))
 
         return Tileset(output_path, self.cols, self.rows, self.tilew, self.tileh, self.scale, self.detection_method,
@@ -1204,7 +1204,7 @@ def createTilesFromImage(path, image_name, tilew=1024, tileh=1024):
     from math import ceil
 
     image_path = path + '/' + image_name
-    image = misc.imread(image_path, flatten=True)
+    image = imread(image_path, flatten=True)
 
     print(image.shape)
     im_h = image.shape[0]
@@ -1233,5 +1233,5 @@ def createTilesFromImage(path, image_name, tilew=1024, tileh=1024):
             col.append(tile)
 
             filename = col_path + '/tile_' + str(r) + '.png'
-            misc.imsave(filename, tile)
+            imsave(filename, tile)
             print('Saved tile ', c, ', ', r, sep='')
