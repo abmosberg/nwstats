@@ -470,7 +470,7 @@ class Tileset:
         return self.lattice
 
     def assignBlobs(self, blobs=None, lattice=None, save=True):
-        """Assign a set of blobs to a lattice. Each blob is assigned to it's nearest lattice point.
+        """Assign a set of blobs to a lattice. Each blob is assigned to its nearest lattice point.
         Return an array of dictionaries, each dictionary representing a blob, and containing the following:
         ['blob']: y, x, and r of the blob
         ['point']: lattice indices of the nearest lattice point
