@@ -243,7 +243,7 @@ class Tileset:
         :return: the two angles defined by the user input, in radians
         """
         fig, ax = plt.subplots(figsize=(24, 12))
-        ax.set_aspect('equal', adjustable='box-forced')
+        ax.set_aspect('equal', adjustable='box')
         plt.axis((0, tile.shape[1], tile.shape[0], 0))
         plt.title("Please click two points")
         plt.tight_layout()
@@ -693,7 +693,7 @@ class Tileset:
         checkpoint = timeCheckpoint(checkpoint, 'filter blobs')
 
         fig, ax = plt.subplots(figsize=figsize)
-        ax.set_aspect('equal', adjustable='box-forced')
+        ax.set_aspect('equal', adjustable='box')
         plt.axis((x_min, x_max, y_max, y_min))
         checkpoint = timeCheckpoint(checkpoint, 'setup plot')
 
@@ -751,7 +751,7 @@ class Tileset:
         tile = self.getTile(col, row)
 
         fig, ax = plt.subplots(figsize=(24, 12))
-        ax.set_aspect('equal', adjustable='box-forced')
+        ax.set_aspect('equal', adjustable='box')
         plt.axis((0, 1023, 1023, 0))
 
         plt.imshow(tile, cmap='gray', interpolation='nearest')
@@ -826,7 +826,7 @@ class Tileset:
         checkpoint = timeCheckpoint(checkpoint, 'getting stuff')
 
         fig, ax = plt.subplots(figsize=(12, 6))
-        ax.set_aspect('equal', adjustable='box-forced')
+        ax.set_aspect('equal', adjustable='box')
 
         if auto_limits:
             plt.axis(self.getExtremes(plus_radius=True, flip=True))
@@ -887,7 +887,7 @@ class Tileset:
             blobs[i, 3] = point['count']
 
         fig, ax = plt.subplots(figsize=(11, 6))
-        ax.set_aspect('equal', adjustable='box-forced')
+        ax.set_aspect('equal', adjustable='box')
         plt.axis(self.getExtremes(plus_radius=True, flip=True, region=region))
 
         from matplotlib.collections import PatchCollection
@@ -963,7 +963,7 @@ class Tileset:
         else:
             raise ValueError("'" + property + "' is not a valid property")
 
-        fig, ax = plt.subplots(1, 1, figsize=(9, 6), subplot_kw={'adjustable': 'box-forced'})
+        fig, ax = plt.subplots(1, 1, figsize=(9, 6), subplot_kw={'adjustable': 'box'})
 
         plt.grid()
         plt.xlabel(label, fontsize=fontsize)
