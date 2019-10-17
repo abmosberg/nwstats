@@ -1,4 +1,5 @@
-from PIL import Image
+from imageio import imread
+
 
 def get_pixel_size(filepath):
     """
@@ -8,10 +9,6 @@ def get_pixel_size(filepath):
     :return: scale (float): Pixel size of image in nm
     """
 
-    metastr = Image.open(filepath).tag[34682][0]
-    meta = {}
-    for cat in metastr.split('[')[1:]:
-        meta[cat[:cat.find("]")]] = dict([x.split("=") for x in cat[cat.find("]") + 1:].split('\r\n') if x])
-
-    scale = float(meta['EScan']['PixelWidth'])*10**9
-    return scale
+    im = imread(filepath, format='FEI')
+    meta = im.meta
+    return meta['EScan']['PixelWidth'] * 10 ** 9
