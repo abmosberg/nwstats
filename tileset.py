@@ -1166,6 +1166,7 @@ class Tileset:
         :param radius: the radius with which to "blur" the plot, experiment with changing it to see what it does
         :return:
         """
+        plt.figure()
         map = self.getDensityMap(scale_factor, radius)
 
         A = np.argwhere(map)
