@@ -1,3 +1,8 @@
+"""
+Defines the Tileset class, containing all the code used to deal with the datasets consisting
+of multiple tiles. In this project, the two NIL patterned datasets, and the random growth area.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 from imageio import imread, imsave

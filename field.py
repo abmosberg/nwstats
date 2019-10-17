@@ -1,7 +1,11 @@
+"""
+Defines the Field class, containing all the code used for analysis of single FIB patterned arrays.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
-from scipy import misc
+from imageio import imread, imsave
 import os
 import pickle
 
@@ -39,7 +43,7 @@ class Field:
     def prepImage(self, kernel_size, prep_path):
         """Preprocess the image of the field by applying median filtering"""
         from scipy.signal import medfilt2d
-        image = misc.imread(self.image_path, flatten=True)
+        image = imread(self.image_path, as_gray=True)
 
         image = medfilt2d(image, kernel_size)
 
@@ -48,7 +52,7 @@ class Field:
 
         path = prep_path + '/' + self.name + '.png'
 
-        misc.imsave(path, image)
+        imsave(path, image)
         print('Saved image ' + self.name)
 
     def detectBlobs(self, methods=(detect.droplets,)):

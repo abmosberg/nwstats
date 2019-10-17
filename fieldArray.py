@@ -1,3 +1,7 @@
+"""
+Defines the FieldArray class, containing code used to deal with the entire matrix of FIB-patterned arrays.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -11,6 +15,16 @@ class FieldArray:
     field_ext = '.fld'
 
     def __init__(self, nfa, nfb, Na, Nb, path, scale, ext='.tif'):
+        """
+
+        :param nfa: Number of fields in the a dimension
+        :param nfb: Number of fields in the b dimension
+        :param Na: Number of lattice points in a direction (not related to a dimension mentioned above, maybe find better way to explain it?)
+        :param Nb: Number of lattice points in b direction
+        :param path: Path to the folder where images of the fields are stored
+        :param scale: Size of a pixel in nm
+        :param ext: File extension of the images
+        """
         self.nfa = nfa      # Number of fields in the a dimension
         self.nfb = nfb      # Number of fields in the b dimension
         self.Na = Na        # Number of lattice points in a direction (not related to a dimension mentioned above, maybe find better way to explain it?)

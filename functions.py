@@ -1,3 +1,7 @@
+"""
+Defines a variety of helper functions used elsewhere in the code.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 

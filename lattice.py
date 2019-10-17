@@ -1,3 +1,7 @@
+"""
+Defines the Lattice class, used for dealing with lattices of a limited size. Used by the Field class.
+"""
+
 import numpy as np
 from math import floor
 import pickle

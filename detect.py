@@ -1,3 +1,7 @@
+"""
+Defines the functions used for feature detection.
+"""
+
 import numpy as np
 import cv2
 
