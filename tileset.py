@@ -860,7 +860,7 @@ class Tileset:
             ax.set_yticklabels([])
             ax.set_xticklabels([])
         if bg_color != '':
-            ax.set_axis_bgcolor(bg_color)
+            ax.set_facecolor(bg_color)
 
         plt.show()
         plt.close()
@@ -1097,7 +1097,7 @@ class Tileset:
         plt.colorbar()
         plt.gca().get_xaxis().set_ticks([])
         plt.gca().get_yaxis().set_ticks([])
-        plt.gca().set_axis_bgcolor('black')
+        plt.gca().set_facecolor('black')
         plt.show()
         plt.close()
 
