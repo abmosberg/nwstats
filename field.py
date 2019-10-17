@@ -385,8 +385,8 @@ class Field:
 
         blobs = self.getBlobs()
 
-        fig, ax = plt.subplots(figsize=(24, 24))
-        ax.set_aspect('equal', adjustable='box-forced')
+        fig, ax = plt.subplots(figsize=(12, 12))
+        ax.set_aspect('equal', adjustable='box')
         plt.axis((0, 1024, 883, 0))
         if show_image:
             image = cv2.imread(self.image_path)
@@ -405,7 +405,7 @@ class Field:
             print('Saved', fig_name, 'plot for field', self.name)
         else:
             plt.show()
-        plt.close()
+        # plt.close()
 
     def plotLattice(self, lattice_color='red', figsize=(10, 10), save=False, prefix='', postfix=''):
         """Plot lattice points
@@ -438,7 +438,7 @@ class Field:
             print('Saved', fig_name, 'plot for field', self.name)
         else:
             plt.show()
-        plt.close()
+        # plt.close()
 
     def plotLatticeAndBlobs(self, blob_color='', lattice_color='cyan', figsize=(10, 10), save=False, prefix='', postfix=''):
         """Plot lattice points, and detected blobs colored by lattice point
@@ -493,7 +493,7 @@ class Field:
             print('Saved', fig_name, 'plot for field', self.name)
         else:
             plt.show()
-        plt.close()
+        # plt.close()
 
     def plotHistogram(self, property, bins=40, fontsize=20, save=False, prefix='', postfix=''):
         """Plot a histogram of a given property of the detected blobs
@@ -518,7 +518,7 @@ class Field:
         else:
             raise ValueError("'" + property + "' is not a valid property")
 
-        fig, ax = plt.subplots(1, 1, figsize=(6, 3), subplot_kw={'adjustable': 'box-forced'})
+        fig, ax = plt.subplots(1, 1, figsize=(6, 3), subplot_kw={'adjustable': 'box'})
 
         ax.set_ylim((0, 70))
         ax.hist(data, bins=bins, range = [0, 300], edgecolor='none', color='#033A87')
@@ -540,4 +540,4 @@ class Field:
             print('Saved', fig_name, 'plot for field', self.name)
         else:
             plt.show()
-        plt.close()
+        # plt.close()
