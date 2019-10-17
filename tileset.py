@@ -486,9 +486,9 @@ class Tileset:
         from scipy.spatial import KDTree
         checkpoint = clock()
 
-        if blobs == None:
+        if blobs is None:
             blobs = self.getBlobs()
-        if lattice == None:
+        if lattice is None:
             lattice = self.getLattice()
 
         assigned_blobs = [{'blob': blob} for blob in blobs]
