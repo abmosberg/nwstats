@@ -699,14 +699,14 @@ class Tileset:
 
         plt.imshow(tiles, extent=[x_min, x_max, y_max, y_min], cmap='gray', interpolation='nearest')
         checkpoint = timeCheckpoint(checkpoint, 'plot tiles')
-        f.plotCircles(ax, blobs, fig, dict(color=blob_color, linewidth=1*feature_scale, fill=False))
+        f.plotCircles(ax, blobs, dict(color=blob_color, linewidth=1 * feature_scale, fill=False))
         checkpoint = timeCheckpoint(checkpoint, 'plot blobs')
 
         if plot_lattice == 'yes' or (plot_lattice == 'auto' and self.lattice):
             lattice = self.getLattice()
             points = self.lattice.getLatticePoints(x_min, x_max, y_min, y_max)
             flip_points = np.fliplr(points)
-            f.plotCircles(ax, flip_points, fig, dict(color=lattice_color, linewidth=5*feature_scale, fill=True))
+            f.plotCircles(ax, flip_points, dict(color=lattice_color, linewidth=5 * feature_scale, fill=True))
             checkpoint = timeCheckpoint(checkpoint, 'plot lattice')
 
             assigned_blobs = self.getAssignedBlobs()
