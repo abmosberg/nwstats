@@ -736,7 +736,7 @@ class Tileset:
 
         if path == '':
             plt.show()
-            plt.close()
+            # plt.close()
         else:
             plt.savefig(path)
             print('Saved figure to', path)
@@ -761,7 +761,7 @@ class Tileset:
         plt.tight_layout()
 
         plt.show()
-        plt.close()
+        # plt.close()
 
     def plotBlobRegion(self, col_min=0, col_max=None, row_min=0, row_max=None, property='radius', hide_axes=False, colormap='',
                        bg_color='', auto_limits=False):
@@ -863,7 +863,7 @@ class Tileset:
             ax.set_facecolor(bg_color)
 
         plt.show()
-        plt.close()
+        # plt.close()
 
     def plotBlobCountPerPoint(self, region=None, only_ones=False):
         """A plot coloring each lattice point by the number of blobs near it
@@ -910,7 +910,7 @@ class Tileset:
 
         plt.tight_layout()
         plt.show()
-        plt.close()
+        # plt.close()
 
     def printYields(self, region=None):
         """Print the percentage yields of lattice points containing n nanowires from n from 0 to 10
@@ -1099,7 +1099,7 @@ class Tileset:
         plt.gca().get_yaxis().set_ticks([])
         plt.gca().set_facecolor('black')
         plt.show()
-        plt.close()
+        # plt.close()
 
     def getDensityMap(self, scale_factor, radius):
         from math import floor, ceil, pi
