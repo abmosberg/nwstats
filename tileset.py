@@ -374,7 +374,8 @@ class Tileset:
 
         # Show the initial guess lattice to the user, to ensure input was not completely wrong
         self.lattice = lattice  # needs to be set for displayTileRegion
-        self.displayTileRegion(0, 0, 0, 0, blob_color='green', lattice_color='red')
+        self.displayTileRegion(0, 0, 0, 0, blob_color='green',
+                               lattice_color='red', title='Lattice initial guess (before optimization)')
 
         lattice = self.optimizeLattice(lattice, assigned_blobs)
         print('Lattice optimized for first tile.')
@@ -667,7 +668,8 @@ class Tileset:
             return (x_min, x_max, y_min, y_max)
 
     def displayTileRegion(self, col_min, col_max, row_min, row_max, plot_lattice='auto', blob_color='red', lattice_color='cyan',
-                          connector_color='yellow', figsize=(24, 12), path='', hide_axes=False, feature_scale=1):
+                          connector_color='yellow', figsize=(24, 12), path='', hide_axes=False, feature_scale=1,
+                          title=None):
         """Display a figure showing a region of the image, with blobs, lattice points and displacement vectors marked
 
         :param col_min, col_max, row_min, row_max: bounding rows and columns of the region to display
@@ -728,6 +730,9 @@ class Tileset:
             ax.add_collection(line_segments)
 
         timeCheckpoint(total_checkpoint, 'total time')
+
+        if title is not None:
+            plt.title(title)
 
         if hide_axes:
             ax.set_yticklabels([])
