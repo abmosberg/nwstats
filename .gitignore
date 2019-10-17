@@ -6,5 +6,9 @@
 *.sublime-project
 .idea/*
 
+# Ignore all date files except the 'tiles'
+data/*
+!data/tiles
+
 __pycache__*
 .ipynb_checkpoints/*

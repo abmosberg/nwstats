@@ -1,10 +1,10 @@
 from tileset import Tileset
 import detect
 
-path = 'data/images/tiled/originals'
+path = 'data/tiles/originals'
 prep_path = 'data/images/tiled/prepped'
 
-tiles = Tileset(path, cols=3, rows=2, tilew=1024, tileh=1024, scale= 9.767, detection_method=detect.tiled)
+tiles = Tileset(path, cols=4, rows=3, tilew=1024, tileh=1024, scale= 9.767, detection_method=detect.tiled)
 tiles = tiles.prepTiles(prep_path, 5)
 
 tiles.displayTileRegion(0, 2, 0, 1)
