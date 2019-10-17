@@ -34,7 +34,7 @@ class FieldArray:
         self.ext = ext      # File extension of the images
 
         self.num_fields = nfa * nfb  # Total number of fields
-        self.fields = [Field(Na, Nb, path, str(num+1).zfill(3), scale, ext) for num in range(0, self.num_fields)]  # List of field objects for all the fields
+        self.fields = [Field(Na, Nb, path, "Array_"+str(num+1).zfill(3), scale, ext) for num in range(0, self.num_fields)]  # List of field objects for all the fields
 
     def prepFields(self, kernel_size, prep_path):
         """Preprocess all images, using median filtering of the given kernel size

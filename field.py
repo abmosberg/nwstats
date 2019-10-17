@@ -5,7 +5,7 @@ Defines the Field class, containing all the code used for analysis of single FIB
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
-from imageio import imread, imsave
+from imageio import imread, imwrite
 import os
 import pickle
 
@@ -43,7 +43,11 @@ class Field:
     def prepImage(self, kernel_size, prep_path):
         """Preprocess the image of the field by applying median filtering"""
         from scipy.signal import medfilt2d
-        image = imread(self.image_path, as_gray=True)
+        image = imread(self.image_path, as_gray=True, )
+
+        # If .png is only 0-255 but saved as 32bit, which is the case for data here, cast it down to uint8
+        if image.max() <= 255:
+            image = np.uint8(image)
 
         image = medfilt2d(image, kernel_size)
 
@@ -52,7 +56,7 @@ class Field:
 
         path = prep_path + '/' + self.name + '.png'
 
-        imsave(path, image)
+        imwrite(path, image)
         print('Saved image ' + self.name)
 
     def detectBlobs(self, methods=(detect.droplets,)):
