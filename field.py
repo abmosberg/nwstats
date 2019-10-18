@@ -8,6 +8,7 @@ import cv2
 from imageio import imread, imwrite
 import os
 import pickle
+from lattice import loadLattice
 
 import functions as f
 from lattice import Lattice
@@ -43,7 +44,7 @@ class Field:
     def prepImage(self, kernel_size, prep_path):
         """Preprocess the image of the field by applying median filtering"""
         from scipy.signal import medfilt2d
-        image = imread(self.image_path, as_gray=True, )
+        image = imread(self.image_path, as_gray=True)
 
         # If .png is only 0-255 but saved as 32bit, which is the case for data here, cast it down to uint8
         if image.max() <= 255:
@@ -226,10 +227,12 @@ class Field:
             return self.lattice
         else:
             try:
-                self.lattice = pickle.load(open(self.lattice_path, 'rb'))
+                self.lattice = loadLattice(self.lattice_path)
                 if self.lattice == None:
                     print('Loaded lattice, but object was empty.')
                     self.makeLattice()
+            except TypeError:
+                self.lattice = pickle.load(open(self.lattice_path, 'rb'))
             except FileNotFoundError:
                 print('Lattice file not found!')
                 self.makeLattice()

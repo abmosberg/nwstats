@@ -51,7 +51,7 @@ def randomColors(n):
     """Returns a list of n arrays that can be used as random colors"""
     colors = []
     for x in range(0, n):
-        colors.append(np.random.rand(3,1))
+        colors.append(np.random.rand(3,))
 
     return colors
 
@@ -79,7 +79,7 @@ def arrayPlot(data, title='', colorbar_label='', percentages=False):
 
     X, Y = np.meshgrid(X, Y)
 
-    Z = np.array(data).reshape((l, l)) # Makes Z a 8x8 2d array
+    Z = np.array(data).reshape((8, 8)) # Makes Z a 8x8 2d array
     Z = np.transpose(Z) # Use this if fluence and diameter are flipped. Otherwise comment out.
     plt.pcolor(X, Y, Z, cmap='viridis')
 
@@ -88,7 +88,7 @@ def arrayPlot(data, title='', colorbar_label='', percentages=False):
     plt.xlabel('Diameter')
     plt.ylabel('Dose')
     plt.axis([0.5, l+0.5, 0.5, l+0.5])
-    ax.set_aspect('equal', adjustable='box-forced')
+    ax.set_aspect('equal', adjustable='box')
 
     if percentages:
         plt.colorbar(format='%1.0f %%', label=colorbar_label)

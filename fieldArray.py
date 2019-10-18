@@ -309,7 +309,7 @@ class FieldArray:
 
             ax.set_ylim((0, 500))
             ax.get_xaxis().set_ticklabels([])
-            ax.get_xaxis().set_ticks([0, pi/2, pi, -pi/2])
+            # ax.get_xaxis().set_ticks([0, pi/2, pi, -pi/2])
             ax.get_yaxis().set_ticklabels([])
 
         plt.tight_layout()
