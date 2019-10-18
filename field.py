@@ -140,11 +140,13 @@ class Field:
 
             self.plotLattice()
 
+
             answer = input('Does the lattice look decent? (Y/N) ')
             if answer == 'y' or answer == 'Y':
                 good_guess = True
             else:
                 print('Try again.')
+            plt.close()
 
         print('Optimizing lattice')
         self.lattice = self.optimizeLattice(self.lattice)

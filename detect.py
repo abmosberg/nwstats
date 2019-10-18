@@ -75,6 +75,21 @@ def droplets(image):
                    invert=False,
                    minThreshold=50,
                    filterByArea=True,
+                   minArea=45,
+                   filterByCircularity=True,
+                   minCircularity=0.85,
+                   filterByInertia=True,
+                   minInertiaRatio=0.8
+                   )
+
+    return blobs
+
+def droplets_original(image):
+
+    blobs = detect(image,
+                   invert=False,
+                   minThreshold=50,
+                   filterByArea=True,
                    minArea=200,
                    filterByCircularity=True,
                    minCircularity=0.85,
