@@ -11,4 +11,5 @@ def get_pixel_size(filepath):
 
     im = imread(filepath, format='FEI')
     meta = im.meta
+    del im
     return meta['EScan']['PixelWidth'] * 10 ** 9
