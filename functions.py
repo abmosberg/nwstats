@@ -55,18 +55,23 @@ def randomColors(n):
 
     return colors
 
-def arrayPlot(data, title='', colorbar_label='', percentages=False):
+def arrayPlot(data, title='', colorbar_label='', percentages=False, is_subplot=False):
     """Plot type used for plotting properties of all fields in an array
 
     :param data: The data to be plotted, one number for each field. Only datasets with a square number of entries will work.
     :param title: title to be printed above the plot
     :param colorbar_label: colorbar label (duh)
     :param percentages: if True, the tics on the colorbar are labeled as percentages
+    :param is_subplot: if axes object, does not make new Figure. Compatible with FieldArray.plotAllYields()
     :return: the pyplot object, wtf?
     """
     from math import sqrt, ceil
-    plt.figure(figsize=(6.5, 5))
-    ax = plt.gca()
+    if is_subplot is not False:
+        ax = is_subplot
+        plt.sca(ax)
+    else:
+        plt.figure(figsize=(6.5, 5))
+        ax = plt.gca()
 
     l = sqrt(len(data))
 

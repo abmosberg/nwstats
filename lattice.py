@@ -43,6 +43,29 @@ class Lattice:
 
         return points
 
+    def getIndices(self, x, y, roundIndices=True):
+        """Return the indices of a lattice point with the given coordinates"""
+        displacement = np.array([x, y]) - self.offset
+        indices = self.decompose(displacement, self.vec_a, self.vec_b)
+        if roundIndices:
+            rounded = [round(index) for index in indices]
+            indices = rounded
+
+        return indices
+
+    def decompose(self, subject, vec_a, vec_b):
+        """Decompose a given vector into a linear combination of two other given vectors
+
+        :param subject: the vector to decompose
+        :param vec_a, vec_b: the two vectors forming the basis into which the input vector is decomposed
+        :return: array containing a and b in the equation a*vec_a + b*vec_b = subject
+        """
+        x = np.transpose(np.array([vec_a, vec_b]))
+        y = np.array(subject)
+        ans = np.linalg.solve(x, y)
+
+        return ans
+
     def save(self, filename):
         """Save the parameters of the lattice"""
         params = [self.Na, self.Nb, self.vec_a, self.vec_b, self.offset]

@@ -12,6 +12,7 @@ data/*
 
 # Scratch files
 scratch*
+scratches/*
 
 __pycache__*
 .ipynb_checkpoints/*

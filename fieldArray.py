@@ -11,6 +11,7 @@ import functions as f
 import detect
 from field import Field
 
+
 class FieldArray:
     field_ext = '.fld'
 
@@ -25,16 +26,17 @@ class FieldArray:
         :param scale: Size of a pixel in nm
         :param ext: File extension of the images
         """
-        self.nfa = nfa      # Number of fields in the a dimension
-        self.nfb = nfb      # Number of fields in the b dimension
-        self.Na = Na        # Number of lattice points in a direction (not related to a dimension mentioned above, maybe find better way to explain it?)
-        self.Nb = Nb        # Number of lattice points in b direction
-        self.path = path    # Path to the folder where images of the fields are stored
+        self.nfa = nfa  # Number of fields in the a dimension
+        self.nfb = nfb  # Number of fields in the b dimension
+        self.Na = Na  # Number of lattice points in a direction (not related to a dimension mentioned above, maybe find better way to explain it?)
+        self.Nb = Nb  # Number of lattice points in b direction
+        self.path = path  # Path to the folder where images of the fields are stored
         self.scale = scale  # Size of a pixel in nm
-        self.ext = ext      # File extension of the images
+        self.ext = ext  # File extension of the images
 
         self.num_fields = nfa * nfb  # Total number of fields
-        self.fields = [Field(Na, Nb, path, "Array_"+str(num+1).zfill(3), scale, ext) for num in range(0, self.num_fields)]  # List of field objects for all the fields
+        self.fields = [Field(Na, Nb, path, "Array_" + str(num + 1).zfill(3), scale, ext) for num in
+                       range(0, self.num_fields)]  # List of field objects for all the fields
 
     def prepFields(self, kernel_size, prep_path):
         """Preprocess all images, using median filtering of the given kernel size
@@ -114,6 +116,18 @@ class FieldArray:
         """Return a list of the median blob diameter of each field."""
         return [field.getMedianDiameter() for field in self.fields]
 
+    def getDisplacements(self):
+        """Return a list of displacements for each blob in each field"""
+        return [field.getDisplacements() for field in self.fields]
+
+    def getDisplacementMagnitudes(self):
+        """Return magnitures of each blob displacement for each field"""
+        return [field.getDisplacementMagnitudes() for field in self.fields]
+
+    def getDisplacementAngles(self):
+        """Return angles of each blob displacement for each field"""
+        return [field.getDisplacementAngles() for field in self.fields]
+
     def getYields(self, n):
         """Return a list of the percentage yields of n nanowires per hole for each field."""
         return [field.getYield(n, percentage=True) for field in self.fields]
@@ -147,7 +161,7 @@ class FieldArray:
         plt = f.arrayPlot(average_blobs, **kwargs)
         plt.show()
 
-    def plotMeanDiameters(self, kwargs):
+    def plotMeanDiameters(self, **kwargs):
         """Display a plot of the mean blob diameter for each field."""
         mean_diameters = self.getMeanDiameters()
         plt = f.arrayPlot(mean_diameters, **kwargs)
@@ -163,7 +177,7 @@ class FieldArray:
         """Display a plot of the mean blob displacement from lattice for each field."""
         mean_displacements = [np.mean(field.getDisplacementMagnitudes()) for field in self.fields]
         for i, d in enumerate(mean_displacements):
-            print(i+1, d)
+            print(i + 1, d)
         plt = f.arrayPlot(mean_displacements, **kwargs)
         plt.show()
 
@@ -198,6 +212,17 @@ class FieldArray:
         plt = f.arrayPlot(yields, title=title, percentages=True)
         plt.show()
 
+    def plotAllYields(self):
+
+        fig, axs = plt.subplots(2, 3, figsize=(12, 8))
+        for n, ax in enumerate(axs.flatten()):
+            yields = self.getYields(n)
+            f.arrayPlot(yields, percentages=True, is_subplot=ax, title=f'{n} NWs')
+        plt.show()
+
+    def plotWithConnects(self, n):
+        self.fields[n - 1].plotWithConnects()
+
     def plotDiameterHistograms(self):
         """Plot histograms of the droplet diameter distributions for each field
 
@@ -205,7 +230,7 @@ class FieldArray:
         """
         from math import ceil
         diametersPerField = [field.getDiameters() for field in self.fields]
-        fig, axes = plt.subplots(8, 8, figsize=(21.5, 10), subplot_kw={'adjustable': 'box-forced'})
+        fig, axes = plt.subplots(8, 8, figsize=(21.5, 10), subplot_kw={'adjustable': 'box'})
         for n, diameters in enumerate(diametersPerField):
             row = 7 - (n) % 8
             col = ceil((n + 1) / 8) - 1
@@ -242,9 +267,8 @@ class FieldArray:
         from math import ceil
         displacements_per_field = [field.getDisplacementMagnitudes() for field in self.fields]
 
-        fig, axes = plt.subplots(8, 8, figsize=(21.5, 10), subplot_kw={'adjustable': 'box-forced'})
+        fig, axes = plt.subplots(8, 8, figsize=(21.5, 10), subplot_kw={'adjustable': 'box'})
         for n, displacements in enumerate(displacements_per_field):
-
             displacements_per_field[n] = displacements
 
             row = 7 - (n) % 8
@@ -270,9 +294,8 @@ class FieldArray:
         from math import ceil
         from math import pi
         displacement_angles_per_field = [field.getDisplacementAngles() for field in self.fields]
-        fig, axes = plt.subplots(8, 8, figsize=(21.5, 10), subplot_kw={'adjustable': 'box-forced'})
+        fig, axes = plt.subplots(8, 8, figsize=(21.5, 10), subplot_kw={'adjustable': 'box'})
         for n, angles in enumerate(displacement_angles_per_field):
-
             row = 7 - (n) % 8
             col = ceil((n + 1) / 8) - 1
 
@@ -295,7 +318,6 @@ class FieldArray:
         from math import ceil, pi
         fig, axes = plt.subplots(8, 8, figsize=(12, 12), subplot_kw=dict(projection='polar'))
         for n, field in enumerate(self.fields):
-
             row = 7 - (n) % 8
             col = ceil((n + 1) / 8) - 1
             ax = axes[row, col]
@@ -324,7 +346,7 @@ class FieldArray:
 
         ax1 = plt.subplot(121, projection='polar')
 
-        field = self.fields[n-1]
+        field = self.fields[n - 1]
 
         r = field.getDisplacementMagnitudes()
         angles = field.getDisplacementAngles()
@@ -333,10 +355,11 @@ class FieldArray:
         ax1.grid(color='#EEEEEE', linestyle='-', linewidth=1)
         ax1.set_axisbelow(True)
 
-        ax1.set_ylim((0, 500))
+        # ax1.set_ylim((0, 500))
+        # ax1.set_ylim((0, 200))
         ax1.get_xaxis().set_ticklabels([])
-        ax1.get_xaxis().set_ticks([0, pi / 2, pi, -pi / 2])
-        ax1.text(2.5, 34*self.scale, str(n).rjust(2))
+        # ax1.get_xaxis().set_ticks([0, pi / 2, pi, -pi / 2])
+        ax1.text(2.5, 34 * self.scale, str(n).rjust(2))
 
         ax2 = plt.subplot(122)
         ax2.hist(r, bins=70, range=[0, 500], histtype='stepfilled', color='limegreen', edgecolor='none')
@@ -348,7 +371,7 @@ class FieldArray:
 
         WARNING: Hard coded numbers.
         """
-        displacements = self.fields[n-1].getDisplacementMagnitudes()
+        displacements = self.fields[n - 1].getDisplacementMagnitudes()
         plt.hist(displacements, bins=26, range=(0, 26), histtype='stepfilled', edgecolor='none', color='#033A87')
         plt.show()
 
@@ -382,7 +405,7 @@ class FieldArray:
 
         max_num = 3
         diameters_sorted = []
-        for n in range(1, max_num+1):
+        for n in range(1, max_num + 1):
             points = [point for point in bbp if len(point) == n]
             diameters = [blob[2] * 2 * self.scale for point in points for blob in point]
 
@@ -400,8 +423,9 @@ class FieldArray:
             if n == 0:
                 label = '1 nanowire'
             else:
-                label = str(n+1) + ' nanowires'
-            plt.hist(data, bins=bins, zorder=0.5+n, label=label, histtype='step', edgecolor=colors2[n%6], alpha=1, range=[min_diameter, max_diameter], linewidth=3)
+                label = str(n + 1) + ' nanowires'
+            plt.hist(data, bins=bins, zorder=0.5 + n, label=label, histtype='step', edgecolor=colors2[n % 6], alpha=1,
+                     range=[min_diameter, max_diameter], linewidth=3)
 
         plt.xlabel('diameter [nm]')
         plt.ylabel('count')

@@ -14,6 +14,9 @@ import functions as f
 from lattice import Lattice
 import detect
 
+from matplotlib.collections import LineCollection
+from matplotlib.colors import colorConverter
+
 class Field:
 
     def __init__(self, Na, Nb, path, name, scale, ext='.tif'):
@@ -499,6 +502,88 @@ class Field:
         else:
             plt.show()
         # plt.close()
+
+    def assignBlobs(self, blobs=None, lattice=None, save=True):
+        """Assign a set of blobs to a lattice. Each blob is assigned to its nearest lattice point.
+        Return an array of dictionaries, each dictionary representing a blob, and containing the following:
+        ['blob']: y, x, and r of the blob
+        ['point']: lattice indices of the nearest lattice point
+        ['distance']: absolute distance to the nearest lattice point
+        ['angle']: angle of the displacement vector from blob to point
+
+        :param blobs: the blobs to be assigned to lattice points, if none is given, self.getBlobs() is used
+        :param lattice: the lattice to which to assign the bobs, if none is given, self.getLattice() is used
+        :param save: if True, self.blobs will be set to the result, and assigned blobs will be saved to file
+                     if False, the result will be returned, but not saved
+        :return: described above
+        """
+        from scipy.spatial import KDTree
+
+        if blobs is None:
+            blobs = self.getBlobs()
+        if lattice is None:
+            lattice = self.getLattice()
+
+        assigned_blobs = [{'blob': blob} for blob in blobs]
+        radius = lattice.getMinLatticeDist() / 2
+
+        points = lattice.getLatticePoints()
+        tree = KDTree(points)
+
+        for a_blob in assigned_blobs:
+            y, x, r = a_blob['blob']
+            distance, index = tree.query([x, y])
+            point = tree.data[index]
+            a_blob['point'] = lattice.getIndices(point[0], point[1])
+            a_blob['pointxy'] = (point[0], point[1])
+            a_blob['distance'] = distance
+            dis = np.array(point) - np.array([x, y])
+            a_blob['angle'] = np.angle(dis[0] + 1j * dis[1])
+
+        if save:
+            self.assigned_blobs = assigned_blobs
+            self.saveAssignedBlobs()
+
+        return assigned_blobs
+
+    def plotWithConnects(self, max_dist=30, savesvg=False):
+        """
+
+        :return:
+        """
+        fig, ax = plt.subplots(figsize=(12,12))
+        ax.set_aspect('equal', adjustable='box')
+
+        ax.set_yticklabels([])
+        ax.set_xticklabels([])
+        plt.tight_layout()
+
+        plt.imshow(cv2.imread(self.image_path), cmap='gray')
+        flip_points = np.fliplr(self.getLattice().getLatticePoints())
+        f.plotCircles(ax, flip_points, dict(color='cyan', linewidth=1, fill=True))
+        blobs = self.getBlobs()
+        f.plotCircles(ax, blobs, dict(color='red', linewidth=1, fill=False))
+
+        assigned_blobs = self.assignBlobs(save=False)
+
+        if max_dist is not None:
+            assigned_blobs = [blob for blob in assigned_blobs if blob['distance'] < max_dist]
+
+        connectors = np.zeros((len(assigned_blobs), 2, 2), float)
+        for i, a_blob in enumerate(assigned_blobs):
+            if len(a_blob['point']) > 0:
+                bx = a_blob['blob'][1]
+                by = a_blob['blob'][0]
+                px = a_blob['pointxy'][1]
+                py = a_blob['pointxy'][0]
+                # [px, py] = flip_points[i]
+                connectors[i, :, :] = [[bx, by], [py, px]]
+
+        colors = colorConverter.to_rgba('yellow')
+        line_segments = LineCollection(connectors, colors=colors, linewidths=1)
+        ax.add_collection(line_segments)
+
+        plt.show()
 
     def plotHistogram(self, property, bins=40, fontsize=20, save=False, prefix='', postfix=''):
         """Plot a histogram of a given property of the detected blobs
