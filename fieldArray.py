@@ -155,7 +155,7 @@ class FieldArray:
         for field in self.fields:
             field.plotLatticeAndBlobs(save=True)
 
-    def plotAvgBlobs(self, kwargs):
+    def plotAvgBlobs(self, **kwargs):
         """Display a plot of the average number of blobs per lattice point for each field."""
         average_blobs = [field.getBlobCount() / field.number_of_points for field in self.fields]
         plt = f.arrayPlot(average_blobs, **kwargs)
@@ -167,13 +167,13 @@ class FieldArray:
         plt = f.arrayPlot(mean_diameters, **kwargs)
         plt.show()
 
-    def plotMedianDiameters(self, kwargs):
+    def plotMedianDiameters(self, **kwargs):
         """Display a plot of the median blob diameter for each field."""
         median_diameters = self.getMedianDiameters()
         plt = f.arrayPlot(median_diameters, **kwargs)
         plt.show()
 
-    def plotMeanDisplacements(self, kwargs):
+    def plotMeanDisplacements(self, **kwargs):
         """Display a plot of the mean blob displacement from lattice for each field."""
         mean_displacements = [np.mean(field.getDisplacementMagnitudes()) for field in self.fields]
         for i, d in enumerate(mean_displacements):
@@ -181,19 +181,19 @@ class FieldArray:
         plt = f.arrayPlot(mean_displacements, **kwargs)
         plt.show()
 
-    def plotMedianDisplacements(self, kwargs):
+    def plotMedianDisplacements(self, **kwargs):
         """Display a plot of the median blob displacement from lattice for each field."""
         median_displacements = [np.median(field.getDisplacementMagnitudes()) for field in self.fields]
         plt = f.arrayPlot(median_displacements, **kwargs)
         plt.show()
 
-    def plotDisplacementStd(self, kwargs):
+    def plotDisplacementStd(self, **kwargs):
         """Display a plot of the standard deviation of the blob displacement from lattice for each field."""
         std_displacements = [np.std(field.getDisplacementMagnitudes()) for field in self.fields]
         plt = f.arrayPlot(std_displacements, **kwargs)
         plt.show()
 
-    def plotDisplacementMdev(self, kwargs):
+    def plotDisplacementMdev(self, **kwargs):
         """Display a plot of the median deviation from the median of the blob displacement from lattice for each field."""
         mdevs = []
         for field in self.fields:
