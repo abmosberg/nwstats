@@ -284,7 +284,7 @@ class FieldArray:
 
         plt.tight_layout()
         plt.show()
-        plt.close()
+
 
     def plotDisplacementAngleHistograms(self):
         """Plot histograms of the droplet displacements angles for each field
