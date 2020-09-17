@@ -1,3 +1,8 @@
+"""
+Defines the ArbitraryLattice class, used for dealing with lattices of arbitrary size.
+Used by the Tileset class.
+"""
+
 import numpy as np
 from math import floor, ceil
 import pickle

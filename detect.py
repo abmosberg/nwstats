@@ -1,3 +1,7 @@
+"""
+Defines the functions used for feature detection.
+"""
+
 import numpy as np
 import cv2
 
@@ -66,6 +70,22 @@ def detect(image,
     return blobs
 
 def droplets(image):
+
+    blobs = detect(image,
+                   invert=False,
+                   minThreshold=50,
+                   filterByArea=True,
+                   minArea=35,
+                   maxArea=200,
+                   filterByCircularity=True,
+                   minCircularity=0.85,
+                   filterByInertia=True,
+                   minInertiaRatio=0.8
+                   )
+
+    return blobs
+
+def droplets_original(image):
 
     blobs = detect(image,
                    invert=False,

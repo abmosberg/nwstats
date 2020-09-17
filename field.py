@@ -1,13 +1,21 @@
+"""
+Defines the Field class, containing all the code used for analysis of single FIB patterned arrays.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
-from scipy import misc
+from imageio import imread, imwrite
 import os
 import pickle
+from lattice import loadLattice
 
 import functions as f
 from lattice import Lattice
 import detect
+
+from matplotlib.collections import LineCollection
+from matplotlib.colors import colorConverter
 
 class Field:
 
@@ -39,7 +47,11 @@ class Field:
     def prepImage(self, kernel_size, prep_path):
         """Preprocess the image of the field by applying median filtering"""
         from scipy.signal import medfilt2d
-        image = misc.imread(self.image_path, flatten=True)
+        image = imread(self.image_path, as_gray=True)
+
+        # If .png is only 0-255 but saved as 32bit, which is the case for data here, cast it down to uint8
+        if image.max() <= 255:
+            image = np.uint8(image)
 
         image = medfilt2d(image, kernel_size)
 
@@ -48,7 +60,7 @@ class Field:
 
         path = prep_path + '/' + self.name + '.png'
 
-        misc.imsave(path, image)
+        imwrite(path, image)
         print('Saved image ' + self.name)
 
     def detectBlobs(self, methods=(detect.droplets,)):
@@ -131,11 +143,13 @@ class Field:
 
             self.plotLattice()
 
+
             answer = input('Does the lattice look decent? (Y/N) ')
             if answer == 'y' or answer == 'Y':
                 good_guess = True
             else:
                 print('Try again.')
+            plt.close()
 
         print('Optimizing lattice')
         self.lattice = self.optimizeLattice(self.lattice)
@@ -218,10 +232,12 @@ class Field:
             return self.lattice
         else:
             try:
-                self.lattice = pickle.load(open(self.lattice_path, 'rb'))
+                self.lattice = loadLattice(self.lattice_path)
                 if self.lattice == None:
                     print('Loaded lattice, but object was empty.')
                     self.makeLattice()
+            except TypeError:
+                self.lattice = pickle.load(open(self.lattice_path, 'rb'))
             except FileNotFoundError:
                 print('Lattice file not found!')
                 self.makeLattice()
@@ -377,14 +393,14 @@ class Field:
 
         blobs = self.getBlobs()
 
-        fig, ax = plt.subplots(figsize=(24, 24))
-        ax.set_aspect('equal', adjustable='box-forced')
+        fig, ax = plt.subplots(figsize=(12, 12))
+        ax.set_aspect('equal', adjustable='box')
         plt.axis((0, 1024, 883, 0))
         if show_image:
             image = cv2.imread(self.image_path)
             plt.imshow(image, cmap='gray', interpolation='nearest')
             plt.axis((0, image.shape[1], image.shape[0], 0))
-        f.plotCircles(ax, blobs, fig, dict(color='red', linewidth=2, fill=False))
+        f.plotCircles(ax, blobs, dict(color='red', linewidth=2, fill=False))
         ax.set_yticklabels([])
         ax.set_xticklabels([])
         plt.tight_layout()
@@ -397,7 +413,7 @@ class Field:
             print('Saved', fig_name, 'plot for field', self.name)
         else:
             plt.show()
-        plt.close()
+        # plt.close()
 
     def plotLattice(self, lattice_color='red', figsize=(10, 10), save=False, prefix='', postfix=''):
         """Plot lattice points
@@ -430,7 +446,7 @@ class Field:
             print('Saved', fig_name, 'plot for field', self.name)
         else:
             plt.show()
-        plt.close()
+        # plt.close()
 
     def plotLatticeAndBlobs(self, blob_color='', lattice_color='cyan', figsize=(10, 10), save=False, prefix='', postfix=''):
         """Plot lattice points, and detected blobs colored by lattice point
@@ -485,7 +501,89 @@ class Field:
             print('Saved', fig_name, 'plot for field', self.name)
         else:
             plt.show()
-        plt.close()
+        # plt.close()
+
+    def assignBlobs(self, blobs=None, lattice=None, save=True):
+        """Assign a set of blobs to a lattice. Each blob is assigned to its nearest lattice point.
+        Return an array of dictionaries, each dictionary representing a blob, and containing the following:
+        ['blob']: y, x, and r of the blob
+        ['point']: lattice indices of the nearest lattice point
+        ['distance']: absolute distance to the nearest lattice point
+        ['angle']: angle of the displacement vector from blob to point
+
+        :param blobs: the blobs to be assigned to lattice points, if none is given, self.getBlobs() is used
+        :param lattice: the lattice to which to assign the bobs, if none is given, self.getLattice() is used
+        :param save: if True, self.blobs will be set to the result, and assigned blobs will be saved to file
+                     if False, the result will be returned, but not saved
+        :return: described above
+        """
+        from scipy.spatial import KDTree
+
+        if blobs is None:
+            blobs = self.getBlobs()
+        if lattice is None:
+            lattice = self.getLattice()
+
+        assigned_blobs = [{'blob': blob} for blob in blobs]
+        radius = lattice.getMinLatticeDist() / 2
+
+        points = lattice.getLatticePoints()
+        tree = KDTree(points)
+
+        for a_blob in assigned_blobs:
+            y, x, r = a_blob['blob']
+            distance, index = tree.query([x, y])
+            point = tree.data[index]
+            a_blob['point'] = lattice.getIndices(point[0], point[1])
+            a_blob['pointxy'] = (point[0], point[1])
+            a_blob['distance'] = distance
+            dis = np.array(point) - np.array([x, y])
+            a_blob['angle'] = np.angle(dis[0] + 1j * dis[1])
+
+        if save:
+            self.assigned_blobs = assigned_blobs
+            self.saveAssignedBlobs()
+
+        return assigned_blobs
+
+    def plotWithConnects(self, max_dist=30, savesvg=False):
+        """
+
+        :return:
+        """
+        fig, ax = plt.subplots(figsize=(12,12))
+        ax.set_aspect('equal', adjustable='box')
+
+        ax.set_yticklabels([])
+        ax.set_xticklabels([])
+        plt.tight_layout()
+
+        plt.imshow(cv2.imread(self.image_path), cmap='gray')
+        flip_points = np.fliplr(self.getLattice().getLatticePoints())
+        f.plotCircles(ax, flip_points, dict(color='cyan', linewidth=1, fill=True))
+        blobs = self.getBlobs()
+        f.plotCircles(ax, blobs, dict(color='red', linewidth=1, fill=False))
+
+        assigned_blobs = self.assignBlobs(save=False)
+
+        if max_dist is not None:
+            assigned_blobs = [blob for blob in assigned_blobs if blob['distance'] < max_dist]
+
+        connectors = np.zeros((len(assigned_blobs), 2, 2), float)
+        for i, a_blob in enumerate(assigned_blobs):
+            if len(a_blob['point']) > 0:
+                bx = a_blob['blob'][1]
+                by = a_blob['blob'][0]
+                px = a_blob['pointxy'][1]
+                py = a_blob['pointxy'][0]
+                # [px, py] = flip_points[i]
+                connectors[i, :, :] = [[bx, by], [py, px]]
+
+        colors = colorConverter.to_rgba('yellow')
+        line_segments = LineCollection(connectors, colors=colors, linewidths=1)
+        ax.add_collection(line_segments)
+
+        plt.show()
 
     def plotHistogram(self, property, bins=40, fontsize=20, save=False, prefix='', postfix=''):
         """Plot a histogram of a given property of the detected blobs
@@ -510,7 +608,7 @@ class Field:
         else:
             raise ValueError("'" + property + "' is not a valid property")
 
-        fig, ax = plt.subplots(1, 1, figsize=(6, 3), subplot_kw={'adjustable': 'box-forced'})
+        fig, ax = plt.subplots(1, 1, figsize=(6, 3), subplot_kw={'adjustable': 'box'})
 
         ax.set_ylim((0, 70))
         ax.hist(data, bins=bins, range = [0, 300], edgecolor='none', color='#033A87')
@@ -532,4 +630,4 @@ class Field:
             print('Saved', fig_name, 'plot for field', self.name)
         else:
             plt.show()
-        plt.close()
+        # plt.close()

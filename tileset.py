@@ -1,6 +1,11 @@
+"""
+Defines the Tileset class, containing all the code used to deal with the datasets consisting
+of multiple tiles. In this project, the two NIL patterned datasets, and the random growth area.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy import misc
+from imageio import imread, imsave
 import random
 import pickle
 import os
@@ -40,7 +45,7 @@ class Tileset:
         """
         file_path = self.path + '/c_' + str(col) + '/tile_' + str(row) + self.ext
         try:
-            tile = misc.imread(file_path)
+            tile = imread(file_path)
         except FileNotFoundError:
             tile = np.zeros((self.tileh, self.tilew), dtype=np.uint8)
 
@@ -120,7 +125,7 @@ class Tileset:
                 cropped_tile = tile[p:-p, p:-p]
 
                 filename = col_path + '/tile_' + str(row) + self.ext
-                misc.imsave(filename, cropped_tile)
+                imsave(filename, cropped_tile)
                 print('Saved tile ' + str(col) + ', ' + str(row))
 
         return Tileset(output_path, self.cols, self.rows, self.tilew, self.tileh, self.scale, self.detection_method,
@@ -243,13 +248,13 @@ class Tileset:
         :return: the two angles defined by the user input, in radians
         """
         fig, ax = plt.subplots(figsize=(24, 12))
-        ax.set_aspect('equal', adjustable='box-forced')
+        ax.set_aspect('equal', adjustable='box')
         plt.axis((0, tile.shape[1], tile.shape[0], 0))
         plt.title("Please click two points")
         plt.tight_layout()
 
         plt.imshow(tile, cmap='gray', interpolation='nearest')
-        f.plotCircles(ax, blobs, fig, dict(color='#114400', linewidth=4, fill=False))
+        f.plotCircles(ax, blobs, dict(color='#114400', linewidth=4, fill=False))
         plt.plot(offset[0], offset[1], '.', color='red', markersize=10)
 
         # Get input
@@ -374,7 +379,8 @@ class Tileset:
 
         # Show the initial guess lattice to the user, to ensure input was not completely wrong
         self.lattice = lattice  # needs to be set for displayTileRegion
-        self.displayTileRegion(0, 0, 0, 0, blob_color='green', lattice_color='red')
+        self.displayTileRegion(0, 0, 0, 0, blob_color='green',
+                               lattice_color='red', title='Lattice initial guess (before optimization)')
 
         lattice = self.optimizeLattice(lattice, assigned_blobs)
         print('Lattice optimized for first tile.')
@@ -470,7 +476,7 @@ class Tileset:
         return self.lattice
 
     def assignBlobs(self, blobs=None, lattice=None, save=True):
-        """Assign a set of blobs to a lattice. Each blob is assigned to it's nearest lattice point.
+        """Assign a set of blobs to a lattice. Each blob is assigned to its nearest lattice point.
         Return an array of dictionaries, each dictionary representing a blob, and containing the following:
         ['blob']: y, x, and r of the blob
         ['point']: lattice indices of the nearest lattice point
@@ -486,9 +492,9 @@ class Tileset:
         from scipy.spatial import KDTree
         checkpoint = clock()
 
-        if blobs == None:
+        if blobs is None:
             blobs = self.getBlobs()
-        if lattice == None:
+        if lattice is None:
             lattice = self.getLattice()
 
         assigned_blobs = [{'blob': blob} for blob in blobs]
@@ -667,7 +673,8 @@ class Tileset:
             return (x_min, x_max, y_min, y_max)
 
     def displayTileRegion(self, col_min, col_max, row_min, row_max, plot_lattice='auto', blob_color='red', lattice_color='cyan',
-                          connector_color='yellow', figsize=(24, 12), path='', hide_axes=False, feature_scale=1):
+                          connector_color='yellow', figsize=(24, 12), path='', hide_axes=False, feature_scale=1,
+                          title=None):
         """Display a figure showing a region of the image, with blobs, lattice points and displacement vectors marked
 
         :param col_min, col_max, row_min, row_max: bounding rows and columns of the region to display
@@ -693,20 +700,20 @@ class Tileset:
         checkpoint = timeCheckpoint(checkpoint, 'filter blobs')
 
         fig, ax = plt.subplots(figsize=figsize)
-        ax.set_aspect('equal', adjustable='box-forced')
+        ax.set_aspect('equal', adjustable='box')
         plt.axis((x_min, x_max, y_max, y_min))
         checkpoint = timeCheckpoint(checkpoint, 'setup plot')
 
         plt.imshow(tiles, extent=[x_min, x_max, y_max, y_min], cmap='gray', interpolation='nearest')
         checkpoint = timeCheckpoint(checkpoint, 'plot tiles')
-        f.plotCircles(ax, blobs, fig, dict(color=blob_color, linewidth=1*feature_scale, fill=False))
+        f.plotCircles(ax, blobs, dict(color=blob_color, linewidth=1 * feature_scale, fill=False))
         checkpoint = timeCheckpoint(checkpoint, 'plot blobs')
 
         if plot_lattice == 'yes' or (plot_lattice == 'auto' and self.lattice):
             lattice = self.getLattice()
             points = self.lattice.getLatticePoints(x_min, x_max, y_min, y_max)
             flip_points = np.fliplr(points)
-            f.plotCircles(ax, flip_points, fig, dict(color=lattice_color, linewidth=5*feature_scale, fill=True))
+            f.plotCircles(ax, flip_points, dict(color=lattice_color, linewidth=5 * feature_scale, fill=True))
             checkpoint = timeCheckpoint(checkpoint, 'plot lattice')
 
             assigned_blobs = self.getAssignedBlobs()
@@ -729,6 +736,9 @@ class Tileset:
 
         timeCheckpoint(total_checkpoint, 'total time')
 
+        if title is not None:
+            plt.title(title)
+
         if hide_axes:
             ax.set_yticklabels([])
             ax.set_xticklabels([])
@@ -736,7 +746,7 @@ class Tileset:
 
         if path == '':
             plt.show()
-            plt.close()
+            # plt.close()
         else:
             plt.savefig(path)
             print('Saved figure to', path)
@@ -751,17 +761,17 @@ class Tileset:
         tile = self.getTile(col, row)
 
         fig, ax = plt.subplots(figsize=(24, 12))
-        ax.set_aspect('equal', adjustable='box-forced')
+        ax.set_aspect('equal', adjustable='box')
         plt.axis((0, 1023, 1023, 0))
 
         plt.imshow(tile, cmap='gray', interpolation='nearest')
-        f.plotCircles(ax, blobs, fig, dict(color='red', linewidth=1, fill=False))
+        f.plotCircles(ax, blobs, dict(color='red', linewidth=1, fill=False))
         ax.set_yticklabels([])
         ax.set_xticklabels([])
         plt.tight_layout()
 
         plt.show()
-        plt.close()
+        # plt.close()
 
     def plotBlobRegion(self, col_min=0, col_max=None, row_min=0, row_max=None, property='radius', hide_axes=False, colormap='',
                        bg_color='', auto_limits=False):
@@ -826,7 +836,7 @@ class Tileset:
         checkpoint = timeCheckpoint(checkpoint, 'getting stuff')
 
         fig, ax = plt.subplots(figsize=(12, 6))
-        ax.set_aspect('equal', adjustable='box-forced')
+        ax.set_aspect('equal', adjustable='box')
 
         if auto_limits:
             plt.axis(self.getExtremes(plus_radius=True, flip=True))
@@ -860,10 +870,10 @@ class Tileset:
             ax.set_yticklabels([])
             ax.set_xticklabels([])
         if bg_color != '':
-            ax.set_axis_bgcolor(bg_color)
+            ax.set_facecolor(bg_color)
 
         plt.show()
-        plt.close()
+        # plt.close()
 
     def plotBlobCountPerPoint(self, region=None, only_ones=False):
         """A plot coloring each lattice point by the number of blobs near it
@@ -887,7 +897,7 @@ class Tileset:
             blobs[i, 3] = point['count']
 
         fig, ax = plt.subplots(figsize=(11, 6))
-        ax.set_aspect('equal', adjustable='box-forced')
+        ax.set_aspect('equal', adjustable='box')
         plt.axis(self.getExtremes(plus_radius=True, flip=True, region=region))
 
         from matplotlib.collections import PatchCollection
@@ -910,7 +920,7 @@ class Tileset:
 
         plt.tight_layout()
         plt.show()
-        plt.close()
+        # plt.close()
 
     def printYields(self, region=None):
         """Print the percentage yields of lattice points containing n nanowires from n from 0 to 10
@@ -963,7 +973,7 @@ class Tileset:
         else:
             raise ValueError("'" + property + "' is not a valid property")
 
-        fig, ax = plt.subplots(1, 1, figsize=(9, 6), subplot_kw={'adjustable': 'box-forced'})
+        fig, ax = plt.subplots(1, 1, figsize=(9, 6), subplot_kw={'adjustable': 'box'})
 
         plt.grid()
         plt.xlabel(label, fontsize=fontsize)
@@ -1097,9 +1107,9 @@ class Tileset:
         plt.colorbar()
         plt.gca().get_xaxis().set_ticks([])
         plt.gca().get_yaxis().set_ticks([])
-        plt.gca().set_axis_bgcolor('black')
+        plt.gca().set_facecolor('black')
         plt.show()
-        plt.close()
+        # plt.close()
 
     def getDensityMap(self, scale_factor, radius):
         from math import floor, ceil, pi
@@ -1166,6 +1176,7 @@ class Tileset:
         :param radius: the radius with which to "blur" the plot, experiment with changing it to see what it does
         :return:
         """
+        plt.figure()
         map = self.getDensityMap(scale_factor, radius)
 
         A = np.argwhere(map)
@@ -1204,7 +1215,7 @@ def createTilesFromImage(path, image_name, tilew=1024, tileh=1024):
     from math import ceil
 
     image_path = path + '/' + image_name
-    image = misc.imread(image_path, flatten=True)
+    image = imread(image_path, flatten=True)
 
     print(image.shape)
     im_h = image.shape[0]
@@ -1233,5 +1244,5 @@ def createTilesFromImage(path, image_name, tilew=1024, tileh=1024):
             col.append(tile)
 
             filename = col_path + '/tile_' + str(r) + '.png'
-            misc.imsave(filename, tile)
+            imsave(filename, tile)
             print('Saved tile ', c, ', ', r, sep='')
